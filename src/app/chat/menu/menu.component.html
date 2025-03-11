@@ -1,0 +1,31 @@
+<mat-toolbar class="menu-toolbar">
+  <h1>AI Customer Support Chat</h1>
+
+  <span class="spacer"></span>
+
+  <div class="icons">
+    <button class="toolbar-icon" mat-icon-button [matMenuTriggerFor]="menu">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <!-- Menu to Reset, Speak to a real Person? [...] -->
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item>
+        <mat-icon>cancel</mat-icon>
+        <span>Reset</span>
+      </button>
+      <button mat-menu-item disabled>
+        <mat-icon>voicemail</mat-icon>
+        <span>Option 2</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon>notifications_off</mat-icon>
+        <span>Option 3</span>
+      </button>
+    </mat-menu>
+
+    <!-- Email contact to dev person -->
+    <mat-icon class="toolbar-icon">contact_support</mat-icon>
+    <!-- Information about current build state (fully operational yet?) -->
+    <mat-icon class="toolbar-icon">info</mat-icon>
+  </div>
+</mat-toolbar>

@@ -1,0 +1,12 @@
+.menu-toolbar {
+  width: 40vw;
+  background-color: #810081;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.toolbar-icon {
+  margin-right: 10px;
+}

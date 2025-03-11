@@ -1,0 +1,15 @@
+.messages-container {
+  height: 60vh;
+  justify-content: end;
+  border-radius: 0;
+}
+.user-message {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.bot-message {
+  justify-content: flex-start;
+  text-align: left;
+}
