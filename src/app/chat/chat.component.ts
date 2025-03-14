@@ -2,8 +2,6 @@ import { Component } from '@angular/core';
 import { InputComponent } from './input/input.component';
 import { MessagesComponent } from './messages/messages.component';
 
-import { MenuComponent } from './menu/menu.component';
-
 @Component({
   selector: 'app-chat',
   imports: [InputComponent, MessagesComponent],

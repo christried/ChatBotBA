@@ -26,6 +26,13 @@ export class MessagesService {
       content: 'I have not received my order yet.',
       timestamp: new Date(),
     },
+    {
+      id: 4,
+      from: 'bot',
+      content:
+        'What do if text is too long for one line lelelelele? What do if text is too long for one line? What do if text is too long for one line? What do if text is too long for one line?',
+      timestamp: new Date(),
+    },
   ];
 
   getMessages(): Messages {

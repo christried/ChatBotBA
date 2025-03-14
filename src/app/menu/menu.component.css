@@ -1,6 +1,8 @@
 .menu-toolbar {
-  width: 40vw;
+  width: 100%;
   background-color: #810081;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
 .spacer {

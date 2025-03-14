@@ -1,22 +1,26 @@
-<mat-card class="messages-container">
-  <mat-list>
-    @for (message of messages; track message) {
-    <mat-list-item
-      [ngClass]="{
-        'user-message': message.from === 'user',
-        'bot-message': message.from === 'bot'
-      }"
-    >
-      <img
-        matListItemAvatar
-        [src]="message.from === 'user' ? 'person.png' : 'bot.png'"
-        [alt]="message.from === 'user' ? 'icon of a person' : 'icon of a robot'"
-      />
+<mat-list class="messages-container">
+  @for (message of messages; track message) {
+  <mat-list-item
+    [ngClass]="{
+      'user-message': message.from === 'user',
+      'bot-message': message.from === 'bot'
+    }"
+  >
+    <img
+      matListItemAvatar
+      [src]="message.from === 'user' ? 'person.png' : 'bot.png'"
+      [alt]="message.from === 'user' ? 'icon of a person' : 'icon of a robot'"
+    />
 
-      <p matListItemLine>
-        <span>{{ message.content }}</span>
-      </p>
-    </mat-list-item>
-    }
-  </mat-list>
-</mat-card>
+    <p>
+      <span
+        [ngClass]="{
+          'user-bubble': message.from === 'user',
+          'bot-bubble': message.from === 'bot'
+        }"
+        >{{ message.content }}</span
+      >
+    </p>
+  </mat-list-item>
+  }
+</mat-list>
