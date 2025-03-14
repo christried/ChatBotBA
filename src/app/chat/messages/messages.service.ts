@@ -1,13 +1,12 @@
-import { Injectable } from '@angular/core';
-import { Messages } from './messages.model';
+import { Injectable, signal } from '@angular/core';
+import { Messages, Message } from './messages.model';
+import { from } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MessagesService {
-  constructor() {}
-
-  private messages: Messages = [
+  public messages = signal<Messages>([
     {
       id: 1,
       from: 'user',
@@ -17,7 +16,7 @@ export class MessagesService {
     {
       id: 2,
       from: 'bot',
-      content: 'sure, I can help you with that. What seems to be the problem?',
+      content: 'Sure, I can help you with that. What seems to be the problem?',
       timestamp: new Date(),
     },
     {
@@ -30,12 +29,33 @@ export class MessagesService {
       id: 4,
       from: 'bot',
       content:
-        'What do if text is too long for one line lelelelele? What do if text is too long for one line? What do if text is too long for one line? What do if text is too long for one line?',
+        'What do if text is too long for one lineeeeeeeeeeeeee? What do if text is too long for one line? What do if text is too long for one line? What do if text is too long for one line?',
       timestamp: new Date(),
     },
-  ];
+  ]);
 
-  getMessages(): Messages {
-    return this.messages;
+  addMessage(content: string) {
+    const newMessage: Message = {
+      id: this.messages().length + 1,
+      from: 'user',
+      content,
+      timestamp: new Date(),
+    };
+    this.messages.update((messages) => [...messages, newMessage]);
+    console.log('SERVICE: Nachricht hinzugefügt:' + this.messages());
+    setTimeout(() => {
+      this.addAnswer('This is an automated reply.');
+    }, 2000);
+  }
+
+  addAnswer(content: string) {
+    const newMessage: Message = {
+      id: this.messages().length + 1,
+      from: 'bot',
+      content,
+      timestamp: new Date(),
+    };
+    this.messages.update((messages) => [...messages, newMessage]);
+    console.log('SERVICE: Antwort hinzugefügt:' + this.messages());
   }
 }

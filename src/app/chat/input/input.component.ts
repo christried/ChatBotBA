@@ -1,15 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {
   FormsModule,
   FormControl,
   FormGroup,
-  Validators,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MessagesService } from '../messages/messages.service';
 
 @Component({
   selector: 'app-input',
@@ -25,8 +26,13 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrls: ['./input.component.css'],
 })
 export class InputComponent {
+  private messagesService = inject(MessagesService);
+
   form = new FormGroup({
-    message: new FormControl('', {}),
+    message: new FormControl('', {
+      validators: [Validators.required],
+      nonNullable: true,
+    }),
   });
 
   onSubmit() {
@@ -34,7 +40,11 @@ export class InputComponent {
       console.log('invalid form!');
       return;
     }
-    console.log(this.form.value);
+
+    const messageContent = this.form.value.message as string;
+    this.messagesService.addMessage(messageContent);
+
+    console.log('INPUT: Nachricht verschickt:' + this.form.value.message);
     this.form.reset();
   }
 }

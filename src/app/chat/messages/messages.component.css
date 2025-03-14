@@ -36,3 +36,8 @@ p {
 .mdc-list-item--with-leading-avatar .mat-mdc-list-item-avatar {
   background-color: #81008100;
 }
+
+.scrollable {
+  overflow-y: auto;
+  max-height: 60vh;
+}
