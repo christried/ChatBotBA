@@ -44,7 +44,7 @@ export class InputComponent {
     const messageContent = this.form.value.message as string;
     this.messagesService.addMessage(messageContent);
 
-    console.log('INPUT: Nachricht verschickt:' + this.form.value.message);
+    // console.log('INPUT: Nachricht verschickt:' + this.form.value.message);
     this.form.reset();
   }
 }

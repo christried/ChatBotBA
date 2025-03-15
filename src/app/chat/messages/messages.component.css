@@ -41,3 +41,7 @@ p {
   overflow-y: auto;
   max-height: 60vh;
 }
+
+.scrollable::-webkit-scrollbar {
+  display: none; /* WebKit (Chrome, Safari) */
+}

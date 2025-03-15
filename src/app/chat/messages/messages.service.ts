@@ -1,6 +1,5 @@
 import { Injectable, signal } from '@angular/core';
 import { Messages, Message } from './messages.model';
-import { from } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -34,6 +33,7 @@ export class MessagesService {
     },
   ]);
 
+  // Method to add a new user message
   addMessage(content: string) {
     const newMessage: Message = {
       id: this.messages().length + 1,
@@ -42,20 +42,22 @@ export class MessagesService {
       timestamp: new Date(),
     };
     this.messages.update((messages) => [...messages, newMessage]);
-    console.log('SERVICE: Nachricht hinzugefügt:' + this.messages());
-    setTimeout(() => {
-      this.addAnswer('This is an automated reply.');
-    }, 2000);
+    // console.log('SERVICE: Nachricht hinzugefügt:' + this.messages());
+
+    this.addAnswer('This is an automated reply.');
   }
 
+  // Method to add a new bot answer
   addAnswer(content: string) {
-    const newMessage: Message = {
-      id: this.messages().length + 1,
-      from: 'bot',
-      content,
-      timestamp: new Date(),
-    };
-    this.messages.update((messages) => [...messages, newMessage]);
-    console.log('SERVICE: Antwort hinzugefügt:' + this.messages());
+    setTimeout(() => {
+      const newMessage: Message = {
+        id: this.messages().length + 1,
+        from: 'bot',
+        content,
+        timestamp: new Date(),
+      };
+      this.messages.update((messages) => [...messages, newMessage]);
+      // console.log('SERVICE: Antwort hinzugefügt:' + this.messages());
+    }, 1000);
   }
 }

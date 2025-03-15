@@ -1,5 +1,5 @@
 <mat-list class="messages-container">
-  <div class="scrollable">
+  <div class="scrollable" #scrollable>
     @for (message of messages; track message ) {
     <mat-list-item
       [ngClass]="{
