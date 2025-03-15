@@ -12,7 +12,8 @@
 }
 
 p {
-  white-space: wrap;
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 .mdc-list-item.mdc-list-item--with-one-line {
@@ -40,6 +41,7 @@ p {
 .scrollable {
   overflow-y: auto;
   max-height: 60vh;
+  scrollbar-gutter: stable; /* Prevents layout shift when scrollbar appears */
 }
 
 .scrollable::-webkit-scrollbar {

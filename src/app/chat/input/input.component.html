@@ -1,11 +1,16 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="message-input-form">
   <mat-form-field class="message-input-container">
     <mat-label>How can we help you today?</mat-label>
-    <input
+    <textarea
       matInput
       placeholder="Ex. Where is my order?"
       formControlName="message"
-    />
+      cdkTextareaAutosize
+      #autosize="cdkTextareaAutosize"
+      [cdkAutosizeMinRows]="1"
+      [cdkAutosizeMaxRows]="5"
+      (keydown)="handleKeyDown($event)"
+    ></textarea>
   </mat-form-field>
   <div class="send-button-container">
     <button mat-fab>
