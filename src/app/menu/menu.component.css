@@ -12,3 +12,7 @@
 .toolbar-icon {
   margin-right: 10px;
 }
+
+.info-button {
+  cursor: default; /* Set cursor to default for the "Info" button */
+}

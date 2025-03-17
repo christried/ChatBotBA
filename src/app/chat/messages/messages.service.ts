@@ -60,4 +60,10 @@ export class MessagesService {
       // console.log('SERVICE: Antwort hinzugefügt:' + this.messages());
     }, 1000);
   }
+
+  // Method to clear all messages
+  resetMessages() {
+    this.messages.set([]);
+    console.log('SERVICE: Nachrichten zurückgesetzt:' + this.messages());
+  }
 }

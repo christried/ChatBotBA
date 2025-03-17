@@ -1,0 +1,39 @@
+@if (data.continued) {
+<h2 mat-dialog-title>Contacting Staff Members</h2>
+
+<mat-dialog-content class="mat-typography">
+  <h3>No Staff Members are currently available for Live Chat</h3>
+  <p>
+    We are sorry, but no staff members are currently available for live chat.
+    Please leave your email address below, and we will get back to you as soon
+    as possible.
+  </p>
+
+  <mat-form-field>
+    <mat-label>What's your email?</mat-label>
+    <input matInput [(ngModel)]="email" />
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>
+} @else {
+
+<h2 mat-dialog-title>Contacting Staff Members</h2>
+
+<mat-dialog-content class="mat-typography">
+  <h3>Are you sure that you want to contact our staff members in person?</h3>
+  <p>
+    Continue to forward your chat conversation to our staff members. They will
+    be able to assist you with your questions and concerns.
+  </p>
+
+  <p>
+    Return to close this window and continue your chat with the AI assistant.
+  </p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Return</button>
+  <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Continue</button>
+</mat-dialog-actions>
+}

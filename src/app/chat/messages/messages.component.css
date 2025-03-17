@@ -14,6 +14,7 @@
 p {
   white-space: normal;
   word-wrap: break-word;
+  word-break: break-all;
 }
 
 .mdc-list-item.mdc-list-item--with-one-line {
@@ -46,4 +47,5 @@ p {
 
 .scrollable::-webkit-scrollbar {
   display: none; /* WebKit (Chrome, Safari) */
+  width: 0;
 }

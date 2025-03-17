@@ -4,32 +4,42 @@
   <span class="spacer"></span>
 
   <div class="icons">
-    <button class="toolbar-icon" mat-icon-button [matMenuTriggerFor]="menu">
+    <button
+      class="toolbar-icon"
+      mat-icon-button
+      [matMenuTriggerFor]="menu"
+      matTooltip="More Options"
+    >
       <mat-icon>menu</mat-icon>
     </button>
     <!-- Menu to Reset, Speak to a real Person? [...] -->
     <mat-menu #menu="matMenu">
-      <button mat-menu-item>
-        <mat-icon>cancel</mat-icon>
-        <span>Reset</span>
+      <button mat-menu-item (click)="onClickReset()">
+        <mat-icon>history</mat-icon>
+        <span>Reset Chat</span>
       </button>
-      <button mat-menu-item disabled>
-        <mat-icon>voicemail</mat-icon>
-        <span>Option 2</span>
-      </button>
-      <button mat-menu-item>
-        <mat-icon>notifications_off</mat-icon>
-        <span>Option 3</span>
+      <button mat-menu-item (click)="onClickRealPersonDialog()">
+        <mat-icon>support_agent</mat-icon>
+        <span>Speak To A Real Person</span>
       </button>
     </mat-menu>
 
     <!-- Email contact to dev person -->
-    <button class="toolbar-icon" mat-icon-button>
-      <mat-icon>contact_support</mat-icon>
+    <button
+      class="toolbar-icon"
+      mat-icon-button
+      matTooltip="Send Feedback To The Developer"
+      (click)="onClickFeedback()"
+    >
+      <mat-icon>feedback</mat-icon>
     </button>
     <!-- Information about current build state (fully operational yet?) -->
-    <button class="toolbar-icon" mat-icon-button>
-      <mat-icon>info</mat-icon>
+    <button
+      class="toolbar-icon info-button"
+      mat-icon-button
+      matTooltip="This app is in early development stage and everything is subject to change"
+    >
+      <mat-icon>code</mat-icon>
     </button>
   </div>
 </mat-toolbar>
