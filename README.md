@@ -14,19 +14,17 @@ This project consists of a responsive chat interface that allows customers to ge
 
 - **Angular** with Material UI components
 - **Signal-based state management** for reactive UI updates
-- **Responsive design** for all device types
+- **Responsive design** for all device types (WiP!)
 
 ### Backend
 
 - **Flask** REST API
 - **OpenAI API** integration using GPT-4o mini for AI responses
-- **Cross-Origin Resource Sharing (CORS)** support
+- **Cross-Origin Resource Sharing (CORS)** support (WiP!)
 
 ## 🔍 Key Features
 
 - Real-time chat interface with the AI assistant
-- Option to contact human staff when needed
-- Chat history and context preservation
 - Health monitoring endpoint
 - Responsive UI with Material design
 
@@ -43,8 +41,8 @@ This project consists of a responsive chat interface that allows customers to ge
 1. **Clone the repository**
 
    ```bash
-   git clone [your-repository-url]
-   cd [repository-name]
+   git clone [https://github.com/christried/ChatBotBA]
+   cd [ChatBotBA]
    ```
 
 2. **Set up the backend**
@@ -82,12 +80,10 @@ This project consists of a responsive chat interface that allows customers to ge
 
 - User authentication
 - Chat conversation persistence
+- Option to contact human staff when needed
+- Chat history and context preservation
 - Enhanced analytics for customer support insights
 - Improved AI model with custom training
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 
