@@ -14,7 +14,7 @@
 p {
   white-space: normal;
   word-wrap: break-word;
-  word-break: break-all;
+  word-break: keep-all;
 }
 
 .mdc-list-item.mdc-list-item--with-one-line {

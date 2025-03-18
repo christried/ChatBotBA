@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+import datetime
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -42,15 +43,24 @@ def chat():
             messages=messages,
         )
         
-        # Extract the chatbot's reply
-        chatbot_message = response.choices[0].message.content
+        # Extract the chatbot's reply. openai docs refer to the model as "assistant" so we'll use that here
+        assistant_message = response.choices[0].message.content
         
         return jsonify({
-            "message": chatbot_message
+            "message": assistant_message
         })
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """Simple endpoint to verify the API is running"""
+    return jsonify({
+        "status": "ok",
+        "version": "0.0.1",
+        "timestamp": datetime.datetime.now().isoformat()
+    })
 
 # run local server
 if __name__ == '__main__':
