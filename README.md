@@ -1,59 +1,94 @@
-# App
+# AI Customer Support Chat App
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.6.
+![Project Status](https://img.shields.io/badge/status-in%20development-yellow)
 
-## Development server
+A modern web application that provides AI-powered customer support chat functionality built with Angular and Flask.
 
-To start a local development server, run:
+## 📝 Overview
 
-```bash
-ng serve
-```
+This project consists of a responsive chat interface that allows customers to get immediate support through an AI assistant. The application includes features like chat history, the ability to contact real staff members, and feedback submission.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## 🛠️ Tech Stack
 
-## Code scaffolding
+### Frontend
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- **Angular** with Material UI components
+- **Signal-based state management** for reactive UI updates
+- **Responsive design** for all device types
 
-```bash
-ng generate component component-name
-```
+### Backend
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- **Flask** REST API
+- **OpenAI API** integration using GPT-4o mini for AI responses
+- **Cross-Origin Resource Sharing (CORS)** support
 
-```bash
-ng generate --help
-```
+## 🔍 Key Features
 
-## Building
+- Real-time chat interface with the AI assistant
+- Option to contact human staff when needed
+- Chat history and context preservation
+- Health monitoring endpoint
+- Responsive UI with Material design
 
-To build the project run:
+## 🚀 Getting Started
 
-```bash
-ng build
-```
+### Prerequisites
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+- Node.js 16+ and npm
+- Python 3.8+
+- OpenAI API key
 
-## Running unit tests
+### Installation
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+1. **Clone the repository**
 
-```bash
-ng test
-```
+   ```bash
+   git clone [your-repository-url]
+   cd [repository-name]
+   ```
 
-## Running end-to-end tests
+2. **Set up the backend**
 
-For end-to-end (e2e) testing, run:
+   ```bash
+   cd backend
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
 
-```bash
-ng e2e
-```
+   # Create a .env file with your OpenAI API key
+   echo "OPENAI_API_KEY=your-api-key-here" > .env
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+   # Start the Flask server
+   python app.py
+   ```
 
-## Additional Resources
+3. **Set up the frontend**
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+   ```bash
+   cd ..
+   npm install
+   ng serve
+   ```
+
+4. **Open the application**
+
+   Navigate to `http://localhost:4200` in your browser
+
+## 📸 Screenshots
+
+[Coming soon]
+
+## 🔮 Future Enhancements
+
+- User authentication
+- Chat conversation persistence
+- Enhanced analytics for customer support insights
+- Improved AI model with custom training
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+> ⚠️ **Note**: This project is in early development stage and everything is subject to change.
