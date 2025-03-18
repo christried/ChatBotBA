@@ -8,34 +8,11 @@ import { environment } from '../../environments/environment';
 })
 export class ChatApiService {
   private apiUrl = environment.apiUrl;
-  private sessionId = 'default'; // Could be user-specific
 
   constructor(private http: HttpClient) {}
 
+  // Send a message to the chat API and return the response
   sendMessage(message: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/api/chat`, {
-      message,
-      sessionId: this.sessionId,
-    });
-  }
-
-  getChatHistory(): Observable<any> {
-    return this.http.get(
-      `${this.apiUrl}/api/chat/history?sessionId=${this.sessionId}`
-    );
-  }
-
-  resetChat(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/api/chat/reset`, {
-      sessionId: this.sessionId,
-    });
-  }
-
-  sendFeedback(feedback: string, email: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/api/feedback`, {
-      feedback,
-      email,
-      sessionId: this.sessionId,
-    });
+    return this.http.post(`${this.apiUrl}/api/chat`, { message });
   }
 }

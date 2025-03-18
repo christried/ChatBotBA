@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://your-production-api-url.com', // Follows later on
+  apiUrl: '', // Follows with deployment
 };
