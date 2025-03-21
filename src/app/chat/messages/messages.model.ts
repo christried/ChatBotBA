@@ -1,6 +1,6 @@
 export interface Message {
   id: number;
-  from: string;
+  from: 'bot' | 'user';
   content: string;
   timestamp: Date;
 }
