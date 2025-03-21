@@ -14,13 +14,16 @@
       />
 
       <p>
-        <span
-          [ngClass]="{
-            'user-bubble': message.from === 'user',
-            'bot-bubble': message.from === 'bot'
-          }"
-          >{{ message.content }}</span
-        >
+        @if (message.from === 'user') {
+        <span class="user-bubble">
+          {{ message.content }}
+        </span>
+        } @if (message.from === 'bot') {
+        <span class="typewriter-container">
+          <span class="bot-bubble">{{ message.content }}</span>
+          <span class="cursor"></span>
+        </span>
+        }
       </p>
     </mat-list-item>
     }

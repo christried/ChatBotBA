@@ -28,11 +28,32 @@ p {
   display: inline-block; /* Ensures background only covers the text */
 }
 
+.bot-message .typewriter-container {
+  position: relative;
+  display: inline-block;
+}
+
 .bot-bubble {
   background-color: #8b6485;
   padding: 5px 10px;
   border-radius: 8px;
-  display: inline-block; /* Ensures background only covers the text */
+  display: inline-block;
+  word-wrap: break-word;
+  white-space: normal;
+  /* Create a mask animation that reveals text from left to right */
+  mask-image: linear-gradient(to right, black 50%, transparent 50%);
+  mask-size: 200% 100%;
+  mask-position: right;
+  animation: reveal-text 1s steps(40, end) forwards;
+}
+
+@keyframes reveal-text {
+  from {
+    mask-position: right;
+  }
+  to {
+    mask-position: left;
+  }
 }
 
 .mdc-list-item--with-leading-avatar .mat-mdc-list-item-avatar {
