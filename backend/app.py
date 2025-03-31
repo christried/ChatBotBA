@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import os
 import datetime
+import uuid
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -28,8 +29,9 @@ db = SQLAlchemy(app)
 # Define Message model
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_message = db.Column(db.Text, nullable=False)
-    assistant_message = db.Column(db.Text, nullable=False)
+    conversation_id = db.Column(db.String(36), nullable=False)  # Use UUID
+    role = db.Column(db.String(20), nullable=False)  # 'user' or 'assistant'
+    content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
 # Initialize database
@@ -42,16 +44,38 @@ def chat():
     try:
         data = request.json
         user_message = data.get('message', '')
+        conversation_id = data.get('conversation_id')
         
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
         
-        # Prepare messages for OpenAI API
+        # Create new conversation if none exists
+        if not conversation_id:
+            conversation_id = str(uuid.uuid4())
+
+        # Store user message in database
+        new_user_message = Message(
+            conversation_id=conversation_id,
+            role="user",
+            content=user_message
+        )
+        db.session.add(new_user_message)
+        db.session.commit()
+
+        # Retrieve conversation history for this conversation_id, but only the last 10 messages to avoid token limit issues
+        # Note: This is a simple approach, in a real-world scenario, you might want to handle this more robustly
+        history = Message.query.filter_by(conversation_id=conversation_id)\
+                            .order_by(Message.timestamp).all()
+
+        # Prepare messages for OpenAI API - full conversation history below
         messages = [
             {"role": "system", "content": "You are a helpful customer support assistant for an e-commerce website. "
-            "Be concise, friendly, and helpful."},
-            {"role": "user", "content": user_message}
+            "Be concise, friendly, and helpful."}
         ]
+
+        # Add conversation history (limit to last 10 messages to manage token usage)
+        for msg in history[-10:]:
+            messages.append({"role": msg.role, "content": msg.content}) 
         
         # Call OpenAI API
         response = client.chat.completions.create(
@@ -61,15 +85,20 @@ def chat():
         )
         
         # Extract the chatbot's reply. openai docs refer to the model as "assistant" so we'll use that here
-        assistant_message = response.choices[0].message.content
+        assistant_message_content = response.choices[0].message.content
 
-        # Store in database
-        new_message = Message(user_message=user_message, assistant_message=assistant_message)
-        db.session.add(new_message)
+        # Store assistant message in database
+        new_assistant_message = Message(
+            conversation_id=conversation_id,
+            role="assistant",
+            content=assistant_message_content
+        )
+        db.session.add(new_assistant_message)
         db.session.commit()
         
         return jsonify({
-            "message": assistant_message
+            "message": assistant_message_content,
+            "conversation_id": conversation_id
         })
         
     except Exception as e:
@@ -81,6 +110,17 @@ def get_messages():
     messages = Message.query.order_by(Message.timestamp.desc()).all()
     return jsonify([
         {"id": msg.id, "user_message": msg.user_message, "assistant_message": msg.assistant_message, "timestamp": msg.timestamp}
+        for msg in messages
+    ])
+
+
+@app.route('/api/conversations/<conversation_id>', methods=['GET'])
+def get_conversation(conversation_id):
+    """Fetch all messages in a specific conversation"""
+    messages = Message.query.filter_by(conversation_id=conversation_id)\
+                          .order_by(Message.timestamp).all()
+    return jsonify([
+        {"id": msg.id, "role": msg.role, "content": msg.content, "timestamp": msg.timestamp}
         for msg in messages
     ])
 
