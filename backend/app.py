@@ -120,7 +120,12 @@ def get_conversation(conversation_id):
     messages = Message.query.filter_by(conversation_id=conversation_id)\
                           .order_by(Message.timestamp).all()
     return jsonify([
-        {"id": msg.id, "role": msg.role, "content": msg.content, "timestamp": msg.timestamp}
+        {
+            "id": msg.id, 
+            "role": msg.role, 
+            "content": msg.content, 
+            "timestamp": msg.timestamp.isoformat()
+        }
         for msg in messages
     ])
 

@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { ChatComponent } from './chat/chat.component';
 import { MenuComponent } from './menu/menu.component';
 import { HealthService } from './health.service';
+import { MessagesService } from './chat/messages/messages.service';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,8 @@ import { HealthService } from './health.service';
 export class AppComponent implements OnInit {
   backendStatus: boolean = false;
   title = 'app';
-  healthService = inject(HealthService); // inject the health service
+  healthService = inject(HealthService);
+  messagesService = inject(MessagesService);
 
   ngOnInit(): void {
     this.checkApiHealth();
@@ -26,6 +28,8 @@ export class AppComponent implements OnInit {
         this.backendStatus = isHealthy;
         if (this.backendStatus) {
           console.log('Backend is running!');
+          // Sync messages with server when backend is available
+          this.messagesService.syncMessagesWithServer();
         }
       },
       error: (err) => {
