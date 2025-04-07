@@ -39,10 +39,20 @@ with app.app_context():
     db.create_all()
 
 # Post PDFs to the Files API from OpenAI to forward context to the model
-client.files.create(
-  file=open("../docs/Kontext/faq.pdf", "rb"),
-  purpose="user_data"
+
+# get absolute path of the file to be uploaded first
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+faq_pdf_path = os.path.join(BASE_DIR, "../docs/Kontext/faq.pdf")
+
+
+uploaded_file_id = None
+files_api_response = client.files.create(
+  file=open(faq_pdf_path, "rb"),
+  purpose="assistants"
 )
+uploaded_file_id = files_api_response.id
+
+
 
 # Define routes for requests from the frontend
 
@@ -90,6 +100,7 @@ def chat():
             model="gpt-4o-mini",  # may be the best one right now, at least it's the cheapest and most popular 
             # store=True, # Used for distillation, may be useful for the future to work with a smaller model :)
             messages=messages,
+            file_ids=[uploaded_file_id] if uploaded_file_id else [],  # Attach the uploaded file if available
         )
         
         # Extract the chatbot's reply. openai docs refer to the model as "assistant" so we'll use that here
