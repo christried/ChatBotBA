@@ -33,32 +33,37 @@ class Message(db.Model):
     role = db.Column(db.String(20), nullable=False)  # 'user' or 'assistant'
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    openai_thread_id = db.Column(db.String(100), nullable=True)
 
 # Initialize database
 with app.app_context():
     db.create_all()
 
-# Post PDFs to the Files API from OpenAI to forward context to the model
-
-# get absolute path of the file to be uploaded first
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-faq_pdf_path = os.path.join(BASE_DIR, "../docs/Kontext/faq.pdf")
-
-
-uploaded_file_id = None
-files_api_response = client.files.create(
-  file=open(faq_pdf_path, "rb"),
-  purpose="assistants"
+# Create a vector store to upload and store all files
+vector_store = client.vector_stores.create(        # Create vector store
+    name="Support Knowledge Base",
 )
-uploaded_file_id = files_api_response.id
+
+faq_pdf_path = os.path.join(BASE_DIR, "../docs/Kontext/faq.pdf")
+client.vector_stores.files.upload_and_poll(        # Upload file
+    vector_store_id=vector_store.id,
+    file=open(faq_pdf_path, "rb")
+)
 
 
+# Create an Assistant with the uploaded file
+assistant = client.beta.assistants.create(
+    instructions="You are a helpful customer support assistant for an e-commerce website. Be concise, friendly, and helpful. Use the uploaded FAQ document to provide accurate information about the company's policies and procedures.",
+    name="Happy Customer Support Assistant",
+    tools=[{"type": "file_search"}],  # Enable retrievals from the uploaded files,
+    tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
+    model="gpt-4o-mini"
+)
 
-# Define routes for requests from the frontend
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
-    """Handle incoming chat messages and generate AI responses"""
+    """Handle incoming chat messages and generate AI responses using Assistants API"""
     try:
         data = request.json
         user_message = data.get('message', '')
@@ -67,61 +72,91 @@ def chat():
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
         
+        # Get or create thread_id associated with this conversation
+        thread_id = None
+        
         # Create new conversation if none exists
         if not conversation_id:
             conversation_id = str(uuid.uuid4())
-
+            # Create a new thread with OpenAI
+            thread = client.beta.threads.create()
+            thread_id = thread.id
+        else:
+            # Find existing thread_id from database
+            existing_msg = Message.query.filter_by(conversation_id=conversation_id).first()
+            if existing_msg and existing_msg.openai_thread_id:
+                thread_id = existing_msg.openai_thread_id
+            else:
+                # Create a new thread if we can't find one
+                thread = client.beta.threads.create()
+                thread_id = thread.id
+        
         # Store user message in database
         new_user_message = Message(
             conversation_id=conversation_id,
             role="user",
-            content=user_message
+            content=user_message,
+            openai_thread_id=thread_id
         )
         db.session.add(new_user_message)
         db.session.commit()
 
-        # Retrieve conversation history for this conversation_id, but only the last 10 messages to avoid token limit issues
-        # Note: This is a simple approach, in a real-world scenario, you might want to handle this more robustly
-        history = Message.query.filter_by(conversation_id=conversation_id)\
-                            .order_by(Message.timestamp).all()
+        # Add the user message to the thread
+        client.beta.threads.messages.create(
+            thread_id=thread_id,
+            role="user",
+            content=user_message,
 
-        # Prepare messages for OpenAI API - full conversation history below
-        messages = [
-            {"role": "system", "content": "You are a helpful customer support assistant for an e-commerce website. "
-            "Be concise, friendly, and helpful."}
-        ]
-
-        # Add conversation history (limit to last 10 messages to manage token usage)
-        for msg in history[-10:]:
-            messages.append({"role": msg.role, "content": msg.content}) 
-        
-        # Call OpenAI API
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",  # may be the best one right now, at least it's the cheapest and most popular 
-            # store=True, # Used for distillation, may be useful for the future to work with a smaller model :)
-            messages=messages,
-            file_ids=[uploaded_file_id] if uploaded_file_id else [],  # Attach the uploaded file if available
         )
-        
-        # Extract the chatbot's reply. openai docs refer to the model as "assistant" so we'll use that here
-        assistant_message_content = response.choices[0].message.content
 
-        # Store assistant message in database
-        new_assistant_message = Message(
-            conversation_id=conversation_id,
-            role="assistant",
-            content=assistant_message_content
-        )
-        db.session.add(new_assistant_message)
-        db.session.commit()
+        # Run the assistant on the thread
+        run = client.beta.threads.runs.create(
+            thread_id=thread_id,
+            assistant_id=assistant.id,
+            additional_instructions=None,             
+        )   
+  
+
+        # Wait for the run to complete
+        while run.status in ["queued", "in_progress"]:
+            run = client.beta.threads.runs.retrieve(
+                thread_id=thread_id,
+                run_id=run.id
+            )
         
-        return jsonify({
-            "message": assistant_message_content,
-            "conversation_id": conversation_id
-        })
+        # If run completed successfully, get the assistant's response
+        if run.status == "completed":
+            # Get the messages from the thread
+            messages = client.beta.threads.messages.list(thread_id=thread_id)
+            
+            # Get the last assistant message
+            assistant_messages = [msg for msg in messages.data if msg.role == "assistant"]
+            if assistant_messages:
+                latest_message = assistant_messages[0]
+                assistant_message_content = latest_message.content[0].text.value
+                
+                # Store assistant message in database
+                new_assistant_message = Message(
+                    conversation_id=conversation_id,
+                    role="assistant",
+                    content=assistant_message_content,
+                    openai_thread_id=thread_id
+                )
+                db.session.add(new_assistant_message)
+                db.session.commit()
+                
+                return jsonify({
+                    "message": assistant_message_content,
+                    "conversation_id": conversation_id
+                })
+            else:
+                return jsonify({"error": "No response from assistant"}), 500
+        else:
+            return jsonify({"error": f"Run failed with status: {run.status}"}), 500
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
     
 @app.route('/api/messages', methods=['GET'])
 def get_messages():
