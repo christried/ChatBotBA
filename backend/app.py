@@ -38,6 +38,14 @@ class Message(db.Model):
 with app.app_context():
     db.create_all()
 
+# Post PDFs to the Files API from OpenAI to forward context to the model
+client.files.create(
+  file=open("../docs/Kontext/faq.pdf", "rb"),
+  purpose="user_data"
+)
+
+# Define routes for requests from the frontend
+
 @app.route('/api/chat', methods=['POST'])
 def chat():
     """Handle incoming chat messages and generate AI responses"""
