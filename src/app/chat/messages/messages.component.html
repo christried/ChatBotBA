@@ -20,7 +20,12 @@
         </span>
         } @if (message.from === 'bot') {
         <span class="typewriter-container">
-          <span class="bot-bubble">{{ message.content }}</span>
+          <span
+            class="bot-bubble"
+            markdown
+            ngPreserveWhitespaces
+            [data]="message.content"
+          ></span>
           <span class="cursor"></span>
         </span>
         }

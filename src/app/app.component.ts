@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
+import { MarkdownModule } from 'ngx-markdown';
 
 import { ChatComponent } from './chat/chat.component';
 import { MenuComponent } from './menu/menu.component';

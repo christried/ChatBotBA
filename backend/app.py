@@ -6,6 +6,8 @@ import datetime
 import uuid
 from openai import OpenAI
 from dotenv import load_dotenv
+import pandas as pd  # to convert Excel files to json (product data to dataframe)
+import json  # to convert Excel files to json (dataframe to json)
 
 # Load environment variables from .env file
 load_dotenv()
@@ -44,16 +46,57 @@ vector_store = client.vector_stores.create(        # Create vector store
     name="Support Knowledge Base",
 )
 
-faq_pdf_path = os.path.join(BASE_DIR, "../docs/Kontext/faq.pdf")
-client.vector_stores.files.upload_and_poll(        # Upload file
-    vector_store_id=vector_store.id,
-    file=open(faq_pdf_path, "rb")
-)
+# Convert product data XLSX to JSON for Assistant compatibility
+xlsx_path = os.path.join(BASE_DIR, "../docs/Kontext/product_data.xlsx")
+json_path = os.path.join(BASE_DIR, "../docs/Kontext/product_data.json")
 
+try:
+    df = pd.read_excel(xlsx_path)
+    df = df.fillna("")  # Replace NaNs with empty strings for JSON compatibility
+    json_data = df.to_dict(orient="records")
+
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(json_data, f, ensure_ascii=False, indent=2)
+
+    print(f"Converted Excel to JSON: {json_path}")
+except Exception as e:
+    print(f"Failed to convert Excel to JSON: {e}")
+
+# List of file paths to upload
+file_paths = [
+    os.path.join(BASE_DIR, "../docs/Kontext/faq.pdf"),
+    os.path.join(BASE_DIR, "../docs/Kontext/shipping_and_returns.pdf"),
+    json_path,
+    os.path.join(BASE_DIR, "../docs/Kontext/ci_and_communication_guidelines.pdf"),
+]
+
+# Upload each file to the vector store (could use batch-uploads but for simplicity we upload one by one)
+for file_path in file_paths:
+    try:
+        client.vector_stores.files.upload_and_poll(
+            vector_store_id=vector_store.id,
+            file=open(file_path, "rb"),
+        )
+        print(f"Successfully uploaded: {file_path}")
+    except Exception as e:
+        print(f"Error uploading {file_path}: {e}")
+
+client.vector_stores.update(
+    vector_store_id=vector_store.id,
+    expires_after={
+        "anchor": "last_active_at",
+        "days": 7
+    }
+)
 
 # Create an Assistant with the uploaded file
 assistant = client.beta.assistants.create(
-    instructions="You are a helpful customer support assistant for an e-commerce website. Be concise, friendly, and helpful. Use the uploaded FAQ document to provide accurate information about the company's policies and procedures.",
+    instructions="You are a helpful customer support assistant for an e-commerce website. Be concise, friendly, and helpful. " \
+    "Use the uploaded FAQ document to provide accurate information about the company's policies and procedures." \
+    "Use the product data to answer questions about products. " \
+    "Use the shipping and returns document to answer questions about shipping and returns. " \
+    "Important: Use the CI and communication guidelines document to influence how you communicate with the person you are chatting with." \
+    "",
     name="Happy Customer Support Assistant",
     tools=[{"type": "file_search"}],  # Enable retrievals from the uploaded files,
     tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
