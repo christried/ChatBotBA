@@ -22,24 +22,30 @@
         <mat-icon>support_agent</mat-icon>
         <span>Speak To A Real Person</span>
       </button>
+      <!-- Email contact to dev person -->
+      <button mat-menu-item (click)="onClickFeedback()">
+        <mat-icon>feedback</mat-icon>
+        <span>Send Feedback To The Developer</span>
+      </button>
     </mat-menu>
 
-    <!-- Email contact to dev person -->
-    <button
-      class="toolbar-icon"
-      mat-icon-button
-      matTooltip="Send Feedback To The Developer"
-      (click)="onClickFeedback()"
-    >
-      <mat-icon>feedback</mat-icon>
-    </button>
     <!-- Information about current build state (fully operational yet?) -->
     <button
       class="toolbar-icon info-button"
       mat-icon-button
       matTooltip="This app is in early development stage and everything is subject to change"
     >
-      <mat-icon>code</mat-icon>
+      <mat-icon>rocket_launch</mat-icon>
     </button>
+
+    <!-- Toggle Group for Language Selection -->
+    <mat-button-toggle-group
+      name="languageSelection"
+      aria-label="language Selection"
+      [hideSingleSelectionIndicator]="true"
+    >
+      <mat-button-toggle value="english">EN</mat-button-toggle>
+      <mat-button-toggle value="german">DE</mat-button-toggle>
+    </mat-button-toggle-group>
   </div>
 </mat-toolbar>

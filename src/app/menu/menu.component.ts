@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -17,6 +18,7 @@ import { RealPersonDialogComponent } from './real-person-dialog/real-person-dial
     MatMenuModule,
     MatButtonModule,
     MatTooltipModule,
+    MatButtonToggleModule,
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.css',
@@ -24,6 +26,7 @@ import { RealPersonDialogComponent } from './real-person-dialog/real-person-dial
 export class MenuComponent {
   private messagesService = inject(MessagesService);
   readonly dialog = inject(MatDialog);
+  hideSingleSelectionIndicator = signal(false);
 
   onClickReset() {
     this.messagesService.resetMessages();
@@ -48,5 +51,9 @@ export class MenuComponent {
   // Not currently working in my Chrome?
   onClickFeedback() {
     window.location.href = 'mailto:gilges.dominik@gmail.com';
+  }
+
+  toggleSingleSelectionIndicator() {
+    this.hideSingleSelectionIndicator.update((value) => !value);
   }
 }
