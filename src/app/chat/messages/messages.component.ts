@@ -10,6 +10,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { NgClass } from '@angular/common';
 import { MarkdownModule } from 'ngx-markdown';
+import { RemoveSourcesPipe } from './remove-sources.pipe';
 
 import { MessagesService } from './messages.service';
 import { Messages } from './messages.model';
@@ -23,6 +24,7 @@ import { Messages } from './messages.model';
     MatIconModule,
     NgClass,
     MarkdownModule,
+    RemoveSourcesPipe,
   ],
   templateUrl: './messages.component.html',
   styleUrls: ['./messages.component.css'],

@@ -28,10 +28,7 @@
               "@angular/material/prebuilt-themes/magenta-violet.css",
               "src/styles.css"
             ],
-            "scripts": [
-              "node_modules/marked/marked.min.js",
-              "node_modules/emoji-toolkit/lib/js/joypixels.min.js"
-            ]
+            "scripts": ["node_modules/emoji-toolkit/lib/js/joypixels.min.js"]
           },
           "configurations": {
             "production": {

@@ -16,16 +16,16 @@
       <p>
         @if (message.from === 'user') {
         <span class="user-bubble">
-          {{ message.content }}
+          <markdown ngPreserveWhitespaces> {{ message.content }} </markdown>
         </span>
         } @if (message.from === 'bot') {
         <span class="typewriter-container">
-          <span
-            class="bot-bubble"
-            markdown
-            ngPreserveWhitespaces
-            [data]="message.content"
-          ></span>
+          <span class="bot-bubble">
+            <markdown ngPreserveWhitespaces>
+              {{ message.content | removeSources }}
+            </markdown>
+          </span>
+
           <span class="cursor"></span>
         </span>
         }
