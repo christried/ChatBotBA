@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 import pandas as pd  # to convert Excel files to json (product data to dataframe)
 import json  # to convert Excel files to json (dataframe to json)
 
+from trello_integration import TrelloIntegration
+
 # Load environment variables from .env file
 load_dotenv()
 # Initialize Flask app
@@ -107,6 +109,47 @@ assistant = client.beta.assistants.create(
     model="gpt-4o-mini"
 )
 
+# Initialize Trello integration
+trello = TrelloIntegration()
+
+# endpoint to finalize a conversation and save it to Trello
+@app.route('/api/conversations/<conversation_id>/finalize', methods=['POST'])
+def finalize_conversation(conversation_id):
+    """Finalize a conversation and save it to Trello"""
+    try:
+        # Get all messages for this conversation
+        messages = Message.query.filter_by(conversation_id=conversation_id)\
+                         .order_by(Message.timestamp).all()
+        
+        # Convert to format expected by Trello integration
+        formatted_messages = [
+            {
+                "role": msg.role,
+                "content": msg.content,
+                "timestamp": msg.timestamp
+            }
+            for msg in messages
+        ]
+        
+        # Create a Trello card for this conversation
+        card_data = trello.create_card_from_conversation(conversation_id, formatted_messages)
+        
+        if card_data:
+            return jsonify({
+                "status": "success",
+                "message": "Conversation saved to Trello",
+                "card_id": card_data.get("id"),
+                "card_url": card_data.get("shortUrl")
+            })
+        else:
+            return jsonify({
+                "status": "error",
+                "message": "Failed to save conversation to Trello"
+            }), 500
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
@@ -115,6 +158,33 @@ def chat():
         data = request.json
         user_message = data.get('message', '')
         conversation_id = data.get('conversation_id')
+        finalize_previous = data.get('finalize_previous', False)
+        
+        if not user_message:
+            return jsonify({"error": "No message provided"}), 400
+        
+        # Finalize previous conversation if requested and if there's a previous conversation
+        if finalize_previous and conversation_id:
+            # Get the previous conversation
+            previous_messages = Message.query.filter_by(conversation_id=conversation_id)\
+                              .order_by(Message.timestamp).all()
+            
+            if previous_messages:
+                # Format messages for Trello
+                formatted_messages = [
+                    {
+                        "role": msg.role,
+                        "content": msg.content,
+                        "timestamp": msg.timestamp
+                    }
+                    for msg in previous_messages
+                ]
+                
+                # Create a Trello card in the background
+                trello.create_card_from_conversation(conversation_id, formatted_messages)
+            
+            # Create new conversation ID for the current message
+            conversation_id = str(uuid.uuid4())
         
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
