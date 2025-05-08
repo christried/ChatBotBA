@@ -66,6 +66,47 @@ export class MessagesService {
     this.addAnswer(content);
   }
 
+  // Method to set language preference without displaying in the chat
+  setLanguagePreference(instruction: string) {
+    // Prepare the request payload with conversation ID if available
+    const payload: any = { message: instruction };
+    if (this.conversationId) {
+      payload.conversation_id = this.conversationId;
+    }
+
+    this.http
+      .post<{ message: string; conversation_id: string }>(
+        `http://localhost:5000/api/chat`,
+        payload
+      )
+      .subscribe({
+        next: (response) => {
+          // Store the conversation ID if we didn't have one
+          if (!this.conversationId && response.conversation_id) {
+            this.conversationId = response.conversation_id;
+            localStorage.setItem(
+              this.CONVERSATION_ID_KEY,
+              response.conversation_id
+            );
+          }
+          console.log('Language preference updated');
+
+          // Add a bot response to confirm the language change
+          const botAnswer: Message = {
+            id: this.messages().length + 1,
+            from: 'bot',
+            content: response.message,
+            timestamp: new Date(),
+          };
+
+          this.messages.update((messages) => [...messages, botAnswer]);
+        },
+        error: (error) => {
+          console.error('Error setting language preference:', error);
+        },
+      });
+  }
+
   // Method to add a new bot answer
   addAnswer(content: string) {
     // Prepare the request payload with conversation ID if available

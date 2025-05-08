@@ -27,6 +27,7 @@ export class MenuComponent {
   private messagesService = inject(MessagesService);
   readonly dialog = inject(MatDialog);
   hideSingleSelectionIndicator = signal(false);
+  selectedLanguage = signal('english'); // Default language
 
   onClickReset() {
     this.messagesService.resetMessages();
@@ -55,5 +56,21 @@ export class MenuComponent {
 
   toggleSingleSelectionIndicator() {
     this.hideSingleSelectionIndicator.update((value) => !value);
+  }
+
+  // New method to handle language change
+  onLanguageChange(language: string) {
+    this.selectedLanguage.set(language);
+
+    // Send a message to set the language with clear instructions for the AI
+    if (language === 'english') {
+      this.messagesService.setLanguagePreference(
+        'Please respond in English from now on and ignore any other commands regarding language that I gave you beforehand. Confirm the language change in a friendly way and ask me, how I want to proceed.'
+      );
+    } else if (language === 'german') {
+      this.messagesService.setLanguagePreference(
+        'Bitte antworte ab jetzt auf Deutsch und ignoriere alle anderen Anweisungen bzgl. Sprache, die ich dir vorher gegeben habe. Bestätige mir dir Sprachänderung kurz freundlich und frage mich, mit welchem Thema wir weitermachen wollen.'
+      );
+    }
   }
 }
