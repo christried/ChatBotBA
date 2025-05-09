@@ -106,7 +106,7 @@ assistant = client.beta.assistants.create(
     name="Happy Customer Support Assistant",
     tools=[{"type": "file_search"}],  # Enable retrievals from the uploaded files,
     tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
-    model="gpt-4o-mini"
+    model="gpt-4.1-nano"
 )
 
 # Initialize Trello integration
