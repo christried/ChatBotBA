@@ -9,49 +9,15 @@ import { Messages, Message } from './messages.model';
 })
 export class MessagesService {
   http = inject(HttpClient);
-  private readonly STORAGE_KEY = 'chat_messages';
-  private readonly CONVERSATION_ID_KEY = 'current_conversation_id';
 
-  // Initialize messages from localStorage
-  public messages = signal<Messages>(this.loadMessagesFromStorage());
+  // Initialize messages as an empty array
+  public messages = signal<Messages>([]);
 
   // Track the conversation ID
-  private conversationId: string | null = localStorage.getItem(
-    this.CONVERSATION_ID_KEY
-  );
+  private conversationId: string | null = null;
 
   constructor() {
-    // Save messages to localStorage whenever they change
-    effect(() => {
-      this.saveMessagesToStorage(this.messages());
-    });
-  }
-
-  // Load messages from localStorage
-  private loadMessagesFromStorage(): Messages {
-    const storedMessages = localStorage.getItem(this.STORAGE_KEY);
-    if (storedMessages) {
-      try {
-        const parsedMessages = JSON.parse(storedMessages);
-        return parsedMessages.map((message: any) => ({
-          ...message,
-          timestamp: new Date(message.timestamp),
-        }));
-      } catch (error) {
-        console.error('Error parsing stored messages:', error);
-        return [];
-      }
-    }
-    return [];
-  }
-
-  // Save messages to localStorage
-  private saveMessagesToStorage(messages: Messages): void {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(messages));
-    } catch (error) {
-      console.error('Error saving messages to localStorage:', error);
-    }
+    // Deleted LocalStorage functionality, may revisit later
   }
 
   // Method to set language preference without displaying in the chat
@@ -64,7 +30,7 @@ export class MessagesService {
 
     this.http
       .post<{ message: string; conversation_id: string }>(
-        `http://localhost:5000/api/chat`,
+        `${environment.apiUrl}/api/chat`,
         payload
       )
       .subscribe({
@@ -72,10 +38,6 @@ export class MessagesService {
           // Store the conversation ID if we didn't have one
           if (!this.conversationId && response.conversation_id) {
             this.conversationId = response.conversation_id;
-            localStorage.setItem(
-              this.CONVERSATION_ID_KEY,
-              response.conversation_id
-            );
           }
           console.log('Language preference updated');
 
@@ -135,10 +97,6 @@ export class MessagesService {
           // Store the conversation ID if we didn't have one
           if (!this.conversationId && response.conversation_id) {
             this.conversationId = response.conversation_id;
-            localStorage.setItem(
-              this.CONVERSATION_ID_KEY,
-              response.conversation_id
-            );
           }
 
           const botAnswer: Message = {
@@ -171,7 +129,7 @@ export class MessagesService {
     if (this.conversationId) {
       this.http
         .get<any[]>(
-          `http://localhost:5000/api/conversations/${this.conversationId}`
+          `${environment.apiUrl}/api/conversations/${this.conversationId}`
         )
         .subscribe({
           next: (response) => {
@@ -185,12 +143,11 @@ export class MessagesService {
               }));
 
               this.messages.set(formattedMessages);
-              this.saveMessagesToStorage(formattedMessages);
             }
           },
           error: (error) => {
             console.error('Error syncing with server:', error);
-            // If there's an error, we'll still have the local messages
+            // If there's an error, keep the empty messages array
           },
         });
     }
@@ -206,8 +163,6 @@ export class MessagesService {
     // Reset conversation state
     this.messages.set([]);
     this.conversationId = null;
-    localStorage.removeItem(this.STORAGE_KEY);
-    localStorage.removeItem(this.CONVERSATION_ID_KEY);
     console.log('SERVICE: Nachrichten zurückgesetzt');
   }
 
@@ -221,7 +176,7 @@ export class MessagesService {
         )
         .subscribe({
           next: (response) => {
-            console.log('Conversation saved to Trello:', response); // Possible to add a client-side message here
+            console.log('Conversation saved to Trello:', response);
           },
           error: (error) => {
             console.error('Error saving conversation to Trello:', error);

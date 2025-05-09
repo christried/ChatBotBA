@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
-import { MarkdownModule } from 'ngx-markdown';
 
 import { ChatComponent } from './chat/chat.component';
 import { MenuComponent } from './menu/menu.component';
@@ -29,8 +28,8 @@ export class AppComponent implements OnInit {
         this.backendStatus = isHealthy;
         if (this.backendStatus) {
           console.log('Backend is running!');
-          // Sync messages with server when backend is available
-          this.messagesService.syncMessagesWithServer();
+          // Deleted LocalStorage functionality here, may revisit later
+          // The conversation ID is now only stored in memory during the session
         }
       },
       error: (err) => {
